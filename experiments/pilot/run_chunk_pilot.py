@@ -25,7 +25,7 @@ def check(parsed,chunk):
  return errors
 
 def main():
- a=argparse.ArgumentParser();a.add_argument('--corpus',type=Path,required=True);a.add_argument('--out',type=Path,required=True);a.add_argument('--url',default='http://127.0.0.1:11439');args=a.parse_args();args.out.mkdir(parents=True,exist_ok=True)
+ a=argparse.ArgumentParser();a.add_argument('--corpus',type=Path,required=True);a.add_argument('--out',type=Path,required=True);a.add_argument('--max-tokens',type=int,default=4096);a.add_argument('--url',default='http://127.0.0.1:11439');args=a.parse_args();args.out.mkdir(parents=True,exist_ok=True)
  corpus=json.loads(args.corpus.read_text());manifest=args.out/'manifest.json'
  if manifest.exists():
   m=json.loads(manifest.read_text())
@@ -66,7 +66,7 @@ def main():
   manifest.write_text(json.dumps(m,ensure_ascii=False,indent=2))
  for idx,j in enumerate(m['jobs']):
   target=args.out/(j['job_id']+'.json')
-  req={'model':'qwen-extraction','messages':[{'role':'system','content':PROMPT},{'role':'user','content':'PASSAGE:\n'+j['text']}],'temperature':.2,'top_p':.9,'seed':j['seed'],'max_tokens':4096,'response_format':{'type':'json_object'},'cache_prompt':False,'repeat_penalty':1.1}
+  req={'model':'qwen-extraction','messages':[{'role':'system','content':PROMPT},{'role':'user','content':'PASSAGE:\n'+j['text']}],'temperature':.2,'top_p':.9,'seed':j['seed'],'max_tokens':args.max_tokens,'response_format':{'type':'json_object'},'cache_prompt':False,'repeat_penalty':1.1}
   if target.exists():
    previous=json.loads(target.read_text())
    if previous.get('job')!=j or previous.get('request')!=req:raise ValueError('Checkpoint input/config mismatch: '+str(target))

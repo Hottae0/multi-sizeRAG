@@ -2,6 +2,7 @@ import hashlib
 import json
 import sys
 import unittest
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -58,6 +59,33 @@ class PipelineTests(unittest.TestCase):
                 self.assertEqual(record['request']['messages'][1]['content'],'PASSAGE:\n'+record['job']['text'])
                 self.assertEqual(record['prompt_sha256'],hashlib.sha256(record['request']['messages'][0]['content'].encode()).hexdigest())
                 self.assertEqual(record['response']['choices'][0]['finish_reason'],'stop')
+
+    def test_e1024_reuses_exact_baseline_regions(self):
+        from prepare_e1024 import prepare
+        base = json.loads((PILOT/'pilot_raw/manifest.json').read_text())
+        with tempfile.TemporaryDirectory() as d:
+            extension = prepare(PILOT/'pilot_raw/manifest.json',Path(d))
+            self.assertEqual(extension['prompt_sha256'],base['prompt_sha256'])
+            self.assertEqual(len(extension['jobs']),2)
+            for region,job in zip(base['regions'],extension['jobs']):
+                self.assertEqual(job['text'],region['text'])
+                self.assertEqual(job['sha256'],region['sha256'])
+                self.assertEqual(job['token_end']-job['token_start'],1024)
+                self.assertEqual(job['char_end']-job['char_start'],len(job['text']))
+            self.assertEqual(prepare(PILOT/'pilot_raw/manifest.json',Path(d)),extension)
+
+    def test_e1024_generation_settings_are_matched(self):
+        baseline=json.loads((PILOT/'pilot_raw/Novel-10146_e512_s17_c00.json').read_text())
+        expected={k:v for k,v in baseline['request'].items() if k!='messages'}
+        manifest=json.loads((PILOT/'e1024_raw/manifest.json').read_text())
+        for job in manifest['jobs']:
+            row=json.loads((PILOT/'e1024_raw'/f"{job['job_id']}.json").read_text())
+            self.assertEqual(row['job'],job)
+            self.assertEqual({k:v for k,v in row['request'].items() if k!='messages'},expected)
+            self.assertEqual(row['request']['messages'][0]['content'],manifest['prompt'])
+            self.assertEqual(row['request']['messages'][1]['content'],'PASSAGE:\n'+job['text'])
+            if row['response']['choices'][0]['finish_reason']=='length':
+                self.assertIn('truncated',row['automatic_errors'])
 
     def test_raw_provenance_and_completion(self):
         m = json.loads((PILOT/'pilot_raw/manifest.json').read_text())

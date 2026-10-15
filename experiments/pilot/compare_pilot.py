@@ -5,10 +5,19 @@ from collections import defaultdict
 
 def norm(s):return ' '.join(unicodedata.normalize('NFKC',s).casefold().split()).strip(' .,;:!?')
 def main():
- parser=argparse.ArgumentParser();parser.add_argument('--raw',type=Path,default=Path(__file__).parent/'pilot_raw');parser.add_argument('--out',type=Path,default=Path(__file__).parent/'pilot_comparison.json');args=parser.parse_args()
- raw=args.raw;m=json.loads((raw/'manifest.json').read_text());sets=defaultdict(lambda:{'entities':set(),'relations':set(),'entity_evidence_ok':set(),'relation_evidence_ok':set()});details=[];runs=[]
+ parser=argparse.ArgumentParser();parser.add_argument('--raw',type=Path,default=Path(__file__).parent/'pilot_raw');parser.add_argument('--extra-raw',type=Path,action='append',default=[]);parser.add_argument('--out',type=Path,default=Path(__file__).parent/'pilot_comparison.json');args=parser.parse_args()
+ raw=args.raw;m=json.loads((raw/'manifest.json').read_text());locations={j['job_id']:raw for j in m['jobs']}
+ for extra in args.extra_raw:
+  extension=json.loads((extra/'manifest.json').read_text())
+  for field in ['corpus_sha256','prompt_sha256','regions']:
+   if extension[field]!=m[field]:raise ValueError('Incompatible extension: '+field)
+  for job in extension['jobs']:
+   if job['job_id'] in locations:raise ValueError('Duplicate job ID')
+   locations[job['job_id']]=extra
+  m['jobs'].extend(extension['jobs'])
+ sets=defaultdict(lambda:{'entities':set(),'relations':set(),'entity_evidence_ok':set(),'relation_evidence_ok':set()});details=[];runs=[]
  for j in m['jobs']:
-  path=raw/(j['job_id']+'.json')
+  path=locations[j['job_id']]/(j['job_id']+'.json')
   if not path.exists():continue
   r=json.loads(path.read_text());p=r.get('parsed');key=(j['doc_id'],j['size'],j['seed']);g=sets[key];usage=r.get('response',{}).get('usage',{})
   runs.append({'id':j['job_id'],'doc':j['doc_id'],'size':j['size'],'seed':j['seed'],'seconds':r['elapsed_seconds'],'errors':r['automatic_errors'],'usage':usage,'raw_entities':len(p.get('entities',[])) if isinstance(p,dict) else None,'raw_relations':len(p.get('relations',[])) if isinstance(p,dict) else None,'finish_reason':r.get('response',{}).get('choices',[{}])[0].get('finish_reason')})
@@ -30,12 +39,14 @@ def main():
   groups.append({'doc':key[0],'size':key[1],'seed':key[2],**{k:len(v) for k,v in g.items()},'raw_entities':sum(r['raw_entities'] or 0 for r in rr),'raw_relations':sum(r['raw_relations'] or 0 for r in rr),'empty_calls':sum(r['raw_entities']==0 and r['raw_relations']==0 for r in rr),'unparseable_calls':sum(r['raw_entities'] is None for r in rr),'calls':len(rr),'seconds':sum(r['seconds'] for r in rr),'prompt_tokens':sum(r['usage'].get('prompt_tokens',0) for r in rr),'completion_tokens':sum(r['usage'].get('completion_tokens',0) for r in rr),'calls_with_errors':sum(bool(r['errors']) for r in rr),'truncated':sum(r['finish_reason']=='length' for r in rr)})
  for doc in [r['doc_id'] for r in m['regions']]:
   combos=[((128,17),(256,17)),((128,17),(512,17)),((256,17),(512,17)),((256,17),(256,29))]
+  sizes=sorted({j['size'] for j in m['jobs'] if j['doc_id']==doc and j['seed']==17})
+  combos.extend(((size,17),(1024,17)) for size in sizes if size!=1024 and 1024 in sizes)
   for a,b in combos:
    ga=sets[(doc,*a)];gb=sets[(doc,*b)]
    for kind in ['entities','relations']:
     x,y=ga[kind],gb[kind];pairs.append({'doc':doc,'a':a,'b':b,'kind':kind,'intersection':len(x&y),'union':len(x|y),'jaccard':len(x&y)/len(x|y) if x|y else None})
-  for size in [128,256,512]:
-   other=set().union(*(sets[(doc,s,17)]['relations'] for s in [128,256,512] if s!=size))
+  for size in sizes:
+   other=set().union(*(sets[(doc,s,17)]['relations'] for s in sizes if s!=size))
    only=sets[(doc,size,17)]['relations']-other
    unique.append({'doc':doc,'size':size,'lexically_unique_relations':len(only),'facts':sorted(only)})
  report={'disclaimer':'Lexical normalized comparison. Exact evidence presence is NOT validity. No semantic entity/relation alignment performed. One region per document, one primary seed, one extra seed at E256.','completed':len(runs),'planned':len(m['jobs']),'groups':groups,'pairs':pairs,'unique':unique,'runs':runs,'relation_details':details}

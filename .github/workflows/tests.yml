@@ -13,3 +13,6 @@ jobs:
       - run: python experiments/pilot/align_relations.py
       - run: python experiments/pilot/check_name_diagnostic.py
       - run: git diff --exit-code -- experiments/pilot/pilot_comparison.json experiments/pilot/aligned_comparison.json experiments/pilot/정렬후_비교.md experiments/pilot/name_diagnostic.json experiments/pilot/이름기반_재실험.md
+      - run: python experiments/pilot/compare_pilot.py --extra-raw experiments/pilot/e1024_raw --out experiments/pilot/e1024_comparison.json
+      - run: python experiments/pilot/report_e1024.py
+      - run: git diff --exit-code -- experiments/pilot/e1024_comparison.json experiments/pilot/e1024_aligned_pairs.json experiments/pilot/E1024_비교.md
