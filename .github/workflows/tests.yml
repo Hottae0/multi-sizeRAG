@@ -1,0 +1,15 @@
+name: Validate recorded experiment
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m unittest discover -s tests -v
+      - run: python experiments/pilot/compare_pilot.py
+      - run: python experiments/pilot/align_relations.py
+      - run: python experiments/pilot/check_name_diagnostic.py
+      - run: git diff --exit-code -- experiments/pilot/pilot_comparison.json experiments/pilot/aligned_comparison.json experiments/pilot/정렬후_비교.md experiments/pilot/name_diagnostic.json experiments/pilot/이름기반_재실험.md
