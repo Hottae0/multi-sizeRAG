@@ -127,6 +127,29 @@ E512의 문자열 relation 합계가 가장 많았지만 **유효 fact 수나 �
 - [1,140회 원시 요청·응답](experiments/expanded/results/raw)
 - [실험 범위 및 재현 방법](experiments/expanded/README.md)
 
+## 출력 잘림 재추출 — 2026-10-16
+
+기존 **Qwen3-VL-4B-Instruct Q4_K_M**에서 잘렸던 15건만 context 65,536, 생성 상한 `max_tokens=-1`로 다시 실행했다. **7B 모델 실험은 아니다.** 약 5시간 49분 동안 실행해 13건은 종료·파싱에 성공했고, 2건은 context 한계에서 다시 잘렸다. 원본 1,140건은 보존했다.
+
+복구 결과를 포함하면 완전한 구간은 E256 두 seed 모두 15/15, E512와 E1024는 각각 14/15가 된다. 세 조건이 모두 완료된 공통 **14구간**에서 다음 문자열 집계를 얻었다.
+
+|항목|256(seed 17)+256(seed 29)|256(seed 17)+512(seed 17)|
+|---|---:|---:|
+|기준 256 관계 문자열|1,169|1,169|
+|추가 관계 문자열|749|1,077|
+|합집합 관계 문자열|1,918|2,246|
+
+다른 크기를 추가하면 신규 관계 문자열이 328개(약 44%) 더 많았다. 구간 내 문자열 중복 제거 후 합산했으며 **유효한 신규 fact 수는 아니다.** 비용은 맞추지 않았고, 선택적으로 설정을 바꾼 복구 결과이므로 기존 동일 설정 실험과 구분한다.
+
+이번 사전 실험에서는 **출력 반복도 잘림의 원인**임을 확인했다. 512토큰 입력 한 건은 43,120토큰을 출력했고, 관계 596항목 중 고유 ID triple은 18종이었다. 출력 상한 확대만으로 추출 품질을 해결하기 어렵다는 관찰이며, 이후 모델 교체에서는 반복 생성과 주체·대상 연결 오류 감소도 확인할 예정이다. 이번 추가 결과에 대한 의미적 유효성 평가나 QA 평가는 수행하지 않았다.
+
+- [추가 실험 확인 보고서](experiments/expanded/retry_results/추가실험_확인결과.md)
+- [재추출 15건 원시 기록](experiments/expanded/retry_results/raw) · [응답별 결과](experiments/expanded/retry_results/retry_results.json)
+- [실행 설정](experiments/expanded/retry_results/environment.json) · [재추출 계획과 원본 해시](experiments/expanded/retry_results/retry_plan.json)
+- [확인 집계 코드](experiments/expanded/audit_retries.py) · [재추출 실행 코드](experiments/expanded/retry_truncated.py)
+
+집계 재현: `python3 experiments/expanded/audit_retries.py`. 기존 원본과 성공한 재추출만 결합해 계산하며 모델을 다시 실행하지 않는다.
+
 ## 상세 기록과 재현
 
 - [최초 36회 결과와 진단 사례](experiments/pilot/청크별_추출_실험결과.md)
