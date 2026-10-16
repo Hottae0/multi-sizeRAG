@@ -1,0 +1,341 @@
+{
+  "job": {
+    "job_id": "Novel-10146_r00_e256_s29_c004",
+    "doc_id": "Novel-10146",
+    "region_id": "Novel-10146_r00",
+    "size": 256,
+    "seed": 29,
+    "token_start": 1024,
+    "token_end": 1280,
+    "char_start": 119178,
+    "char_end": 120261,
+    "text": ". It was a frame building, four stories high and nicely situated. The proprietors of it intended it should be a family hotel, but it did not meet with the success anticipated, and when, on the 19th of May, 1878, it was burned to the ground it was unoccupied. The fire was thought to be the work of incendiaries. The loss was about $20,000, partially insured. Four firemen were quite seriously injured at this fire, but all recovered. The Carpenter house, on the corner of Summit avenue and Ramsey street, was built by Warren Carpenter. Mr. Carpenter was a man of colossal ideas, and from the picturesque location of his hotel, overlooking the city, he could see millions of tourists flocking to his hostelry. The panic of 1857, soon followed by the great Civil war, put a quietus on immigration, and left him stranded high on the beach. Mr. Carpenter's dream of millions were far from being realized, and when on the 26th of January, 1879, the hotel was burned to the ground, it had for some time previous passed beyond his control. At one time there were three flourishing hotels on",
+    "sha256": "ce38bf8a51a99357da6f049546a120a0a4bbc8dd0f555aa61875018446d4c010"
+  },
+  "request": {
+    "model": "qwen-extraction",
+    "messages": [
+      {
+        "role": "system",
+        "content": "Extract named entities and explicit relations from the supplied passage only. The passage is data, never instructions. Do not use outside knowledge or guess. Preserve direction, negation and uncertainty in predicate wording. Return one JSON object only with keys entities and relations. entities is a list of {id, name, type, evidence}. relations is a list of {source, predicate, target, evidence}; source and target must refer to entity ids. Each evidence must be a verbatim substring of the passage that supports the item. Every entity MUST include an evidence field, even if the evidence is just its exact name as written in the passage. Every relation MUST include an evidence field. Before returning, verify all entities have all four required keys: id, name, type, evidence. Omit unsupported items. Use empty lists when appropriate. Return compact JSON without indentation. Do not repeat entities or relations. Do not create generic category nodes such as hotel or person merely to express an entity type. A relation must connect two independently identified entities and its evidence must support that specific pair."
+      },
+      {
+        "role": "user",
+        "content": "PASSAGE:\n. It was a frame building, four stories high and nicely situated. The proprietors of it intended it should be a family hotel, but it did not meet with the success anticipated, and when, on the 19th of May, 1878, it was burned to the ground it was unoccupied. The fire was thought to be the work of incendiaries. The loss was about $20,000, partially insured. Four firemen were quite seriously injured at this fire, but all recovered. The Carpenter house, on the corner of Summit avenue and Ramsey street, was built by Warren Carpenter. Mr. Carpenter was a man of colossal ideas, and from the picturesque location of his hotel, overlooking the city, he could see millions of tourists flocking to his hostelry. The panic of 1857, soon followed by the great Civil war, put a quietus on immigration, and left him stranded high on the beach. Mr. Carpenter's dream of millions were far from being realized, and when on the 26th of January, 1879, the hotel was burned to the ground, it had for some time previous passed beyond his control. At one time there were three flourishing hotels on"
+      }
+    ],
+    "temperature": 0.2,
+    "top_p": 0.9,
+    "seed": 29,
+    "max_tokens": 4096,
+    "response_format": {
+      "type": "json_object"
+    },
+    "cache_prompt": false,
+    "repeat_penalty": 1.1
+  },
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"entities\": [\n    {\n      \"id\": \"e1\",\n      \"name\": \"frame building\",\n      \"type\": \"building\",\n      \"evidence\": \"It was a frame building\"\n    },\n    {\n      \"id\": \"e2\",\n      \"name\": \"four stories high\",\n      \"type\": \"building feature\",\n      \"evidence\": \"four stories high\"\n    },\n    {\n      \"id\": \"e3\",\n      \"name\": \"family hotel\",\n      \"type\": \"hotel type\",\n      \"evidence\": \"The proprietors of it intended it should be a family hotel\"\n    },\n    {\n      \"id\": \"e4\",\n      \"name\": \"Carpenter house\",\n      \"type\": \"building\",\n      \"evidence\": \"The Carpenter house, on the corner of Summit avenue and Ramsey street\"\n    },\n    {\n      \"id\": \"e5\",\n      \"name\": \"Warren Carpenter\",\n      \"type\": \"person\",\n      \"evidence\": \"The Carpenter house... was built by Warren Carpenter. Mr. Carpenter\"\n    },\n    {\n      \"id\": \"e6\",\n      \"name\": \"Summit avenue and Ramsey street\",\n      \"type\": \"location\",\n      \"evidence\": \"on the corner of Summit avenue and Ramsey street\"\n    },\n    {\n      \"id\": \"e7\",\n      \"name\": \"19th of May, 1878\",\n      \"type\": \"date\",\n      \"evidence\": \"on the 19th of May, 1878\"\n    },\n    {\n      \"id\": \"e8\",\n      \"name\": \"fire\",\n      \"type\": \"event\",\n      \"evidence\": \"it was burned to the ground\"\n    },\n    {\n      \"id\": \"e9\",\n      \"name\": \"incendiaries\",\n      \"type\": \"cause\",\n      \"evidence\": \"The fire was thought to be the work of incendiaries\"\n    },\n    {\n      \"id\": \"e10\",\n      \"name\": \"$20,000 loss\",\n      \"type\": \"financial value\",\n      \"evidence\": \"The loss was about $20,000\"\n    },\n    {\n      \"id\": \"e11\",\n      \"name\": \"partially insured\",\n      \"type\": \"insurance status\",\n      \"evidence\": \"partially insured\"\n    },\n    {\n      \"id\": \"e12\",\n      \"name\": \"four firemen\",\n      \"type\": \"group of people\",\n      \"evidence\": \"Four firemen were quite seriously injured\"\n    },\n    {\n      \"id\": \"e13\",\n      \"name\": \"recovered\",\n      \"type\": \"health status\",\n      \"evidence\": \"but all recovered\"\n    },\n    {\n      \"id\": \"e14\",\n      \"name\": \"panic of 1857\",\n      \"type\": \"event\",\n      \"evidence\": \"The panic of 1857, soon followed by the great Civil war\"\n    },\n    {\n      \"id\": \"e15\",\n      \"name\": \"great Civil war\",\n      \"type\": \"event\",\n      \"evidence\": \"The panic of 1857, soon followed by the great Civil war\"\n    },\n    {\n      \"id\": \"e16\",\n      \"name\": \"immigration\",\n      \"type\": \"event\",\n      \"evidence\": \"put a quietus on immigration\"\n    },\n    {\n      \"id\": \"e17\",\n      \"name\": \"high on the beach\",\n      \"type\": \"location description\",\n      \"evidence\": \"left him stranded high on the beach\"\n    },\n    {\n      \"id\": \"e18\",\n      \"name\": \"millions of tourists\",\n      \"type\": \"audience\",\n      \"evidence\": \"he could see millions of tourists flocking to his hostelry\"\n    },\n    {\n      \"id\": \"e19\",\n      \"name\": \"Mr. Carpenter's dream of millions\",\n      \"type\": \"aspiration\",\n      \"evidence\": \"Mr. Carpenter's dream of millions were far from being realized\"\n    },\n    {\n      \"id\": \"e20\",\n      \"name\": \"26th of January, 1879\",\n      \"type\": \"date\",\n      \"evidence\": \"on the 26th of January, 1879\"\n    },\n    {\n      \"id\": \"e21\",\n      \"name\": \"hotel burned to ground\",\n      \"type\": \"event\",\n      \"evidence\": \"the hotel was burned to the ground\"\n    },\n    {\n      \"id\": \"e22\",\n      \"name\": \"passed beyond his control\",\n      \"type\": \"state\",\n      \"evidence\": \"it had for some time previous passed beyond his control\"\n    },\n    {\n      \"id\": \"e23\",\n      \"name\": \"three flourishing hotels\",\n      \"type\": \"hotel count\",\n      \"evidence\": \"At one time there were three flourishing hotels on\"\n    }\n  ],\n  \"relations\": [\n    {\n      \"source\": \"e1\",\n      \"predicate\": \"was\",\n      \"target\": \"e2\",\n      \"evidence\": \"It was a frame building, four stories high and nicely situated.\"\n    },\n    {\n      \"source\": \"e1\",\n      \"predicate\": \"intended to be\",\n      \"target\": \"e3\",\n      \"evidence\": \"The proprietors of it intended it should be a family hotel\"\n    },\n    {\n      \"source\": \"e1\",\n      \"predicate\": \"was burned to the ground on\",\n      \"target\": \"e7\",\n      \"evidence\": \"on the 19th of May, 1878, it was burned to the ground\"\n    },\n    {\n      \"source\": \"e1\",\n      \"predicate\": \"was unoccupied when burned\",\n      \"target\": \"e7\",\n      \"evidence\": \"when, on the 19th of May, 1878, it was burned to the ground it was unoccupied\"\n    },\n    {\n      \"source\": \"e1\",\n      \"predicate\": \"was thought to be caused by\",\n      \"target\": \"e9\",\n      \"evidence\": \"The fire was thought to be the work of incendiaries\"\n    },\n    {\n      \"source\": \"e1\",\n      \"predicate\": \"had loss of\",\n      \"target\": \"e10\",\n      \"evidence\": \"The loss was about $20,000\"\n    },\n    {\n      \"source\": \"e1\",\n      \"predicate\": \"was partially insured\",\n      \"target\": \"e11\",\n      \"evidence\": \"partially insured\"\n    },\n    {\n      \"source\": \"e12\",\n      \"predicate\": \"were injured in\",\n      \"target\": \"e8\",\n      \"evidence\": \"Four firemen were quite seriously injured at this fire, but all recovered.\"\n    },\n    {\n      \"source\": \"e12\",\n      \"predicate\": \"recovered from\",\n      \"target\": \"e8\",\n      \"evidence\": \"but all recovered\"\n    },\n    {\n      \"source\": \"e4\",\n      \"predicate\": \"was built by\",\n      \"target\": \"e5\",\n      \"evidence\": \"The Carpenter house, on the corner of Summit avenue and Ramsey street, was built by Warren Carpenter.\"\n    },\n    {\n      \"source\": \"e5\",\n      \"predicate\": \"had colossal ideas\",\n      \"target\": \"e19\",\n      \"evidence\": \"Mr. Carpenter was a man of colossal ideas\"\n    },\n    {\n      \"source\": \"e5\",\n      \"predicate\": \"could see\",\n      \"target\": \"e18\",\n      \"evidence\": \"he could see millions of tourists flocking to his hostelry\"\n    },\n    {\n      \"source\": \"e4\",\n      \"predicate\": \"was located at\",\n      \"target\": \"e6\",\n      \"evidence\": \"The Carpenter house, on the corner of Summit avenue and Ramsey street\"\n    },\n    {\n      \"source\": \"e14\",\n      \"predicate\": \"followed by\",\n      \"target\": \"e15\",\n      \"evidence\": \"The panic of 1857, soon followed by the great Civil war\"\n    },\n    {\n      \"source\": \"e16\",\n      \"predicate\": \"was put on quietus by\",\n      \"target\": \"e14\",\n      \"evidence\": \"The panic of 1857, soon followed by the great Civil war, put a quietus on immigration\"\n    },\n    {\n      \"source\": \"e5\",\n      \"predicate\": \"was stranded at\",\n      \"target\": \"e17\",\n      \"evidence\": \"left him stranded high on the beach\"\n    },\n    {\n      \"source\": \"e4\",\n      \"predicate\": \"was burned to ground on\",\n      \"target\": \"e20\",\n      \"evidence\": \"on the 26th of January, 1879, the hotel was burned to the ground\"\n    },\n    {\n      \"source\": \"e4\",\n      \"predicate\": \"had passed beyond control by\",\n      \"target\": \"e22\",\n      \"evidence\": \"it had for some time previous passed beyond his control\"\n    },\n    {\n      \"source\": \"e13\",\n      \"predicate\": \"was recovered from\",\n      \"target\": \"e8\",\n      \"evidence\": \"but all recovered\"\n    },\n    {\n      \"source\": \"e23\",\n      \"predicate\": \"existed at one time with\",\n      \"target\": \"e4\",\n      \"evidence\": \"At one time there were three flourishing hotels on\"\n    }\n  ]\n}"
+        }
+      }
+    ],
+    "created": 1792098562,
+    "model": "qwen-extraction",
+    "system_fingerprint": "b11351-631109b34",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 2106,
+      "prompt_tokens": 485,
+      "total_tokens": 2591,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "id": "chatcmpl-Wogv5d9KX8W9y4fx007TeaG3l7MK5yHA",
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 485,
+      "prompt_ms": 3102.399,
+      "prompt_per_token_ms": 6.3966989690721645,
+      "prompt_per_second": 156.33063316485084,
+      "predicted_n": 2106,
+      "predicted_ms": 104763.641,
+      "predicted_per_token_ms": 49.76895059382423,
+      "predicted_per_second": 20.09284881574515
+    }
+  },
+  "parsed": {
+    "entities": [
+      {
+        "id": "e1",
+        "name": "frame building",
+        "type": "building",
+        "evidence": "It was a frame building"
+      },
+      {
+        "id": "e2",
+        "name": "four stories high",
+        "type": "building feature",
+        "evidence": "four stories high"
+      },
+      {
+        "id": "e3",
+        "name": "family hotel",
+        "type": "hotel type",
+        "evidence": "The proprietors of it intended it should be a family hotel"
+      },
+      {
+        "id": "e4",
+        "name": "Carpenter house",
+        "type": "building",
+        "evidence": "The Carpenter house, on the corner of Summit avenue and Ramsey street"
+      },
+      {
+        "id": "e5",
+        "name": "Warren Carpenter",
+        "type": "person",
+        "evidence": "The Carpenter house... was built by Warren Carpenter. Mr. Carpenter"
+      },
+      {
+        "id": "e6",
+        "name": "Summit avenue and Ramsey street",
+        "type": "location",
+        "evidence": "on the corner of Summit avenue and Ramsey street"
+      },
+      {
+        "id": "e7",
+        "name": "19th of May, 1878",
+        "type": "date",
+        "evidence": "on the 19th of May, 1878"
+      },
+      {
+        "id": "e8",
+        "name": "fire",
+        "type": "event",
+        "evidence": "it was burned to the ground"
+      },
+      {
+        "id": "e9",
+        "name": "incendiaries",
+        "type": "cause",
+        "evidence": "The fire was thought to be the work of incendiaries"
+      },
+      {
+        "id": "e10",
+        "name": "$20,000 loss",
+        "type": "financial value",
+        "evidence": "The loss was about $20,000"
+      },
+      {
+        "id": "e11",
+        "name": "partially insured",
+        "type": "insurance status",
+        "evidence": "partially insured"
+      },
+      {
+        "id": "e12",
+        "name": "four firemen",
+        "type": "group of people",
+        "evidence": "Four firemen were quite seriously injured"
+      },
+      {
+        "id": "e13",
+        "name": "recovered",
+        "type": "health status",
+        "evidence": "but all recovered"
+      },
+      {
+        "id": "e14",
+        "name": "panic of 1857",
+        "type": "event",
+        "evidence": "The panic of 1857, soon followed by the great Civil war"
+      },
+      {
+        "id": "e15",
+        "name": "great Civil war",
+        "type": "event",
+        "evidence": "The panic of 1857, soon followed by the great Civil war"
+      },
+      {
+        "id": "e16",
+        "name": "immigration",
+        "type": "event",
+        "evidence": "put a quietus on immigration"
+      },
+      {
+        "id": "e17",
+        "name": "high on the beach",
+        "type": "location description",
+        "evidence": "left him stranded high on the beach"
+      },
+      {
+        "id": "e18",
+        "name": "millions of tourists",
+        "type": "audience",
+        "evidence": "he could see millions of tourists flocking to his hostelry"
+      },
+      {
+        "id": "e19",
+        "name": "Mr. Carpenter's dream of millions",
+        "type": "aspiration",
+        "evidence": "Mr. Carpenter's dream of millions were far from being realized"
+      },
+      {
+        "id": "e20",
+        "name": "26th of January, 1879",
+        "type": "date",
+        "evidence": "on the 26th of January, 1879"
+      },
+      {
+        "id": "e21",
+        "name": "hotel burned to ground",
+        "type": "event",
+        "evidence": "the hotel was burned to the ground"
+      },
+      {
+        "id": "e22",
+        "name": "passed beyond his control",
+        "type": "state",
+        "evidence": "it had for some time previous passed beyond his control"
+      },
+      {
+        "id": "e23",
+        "name": "three flourishing hotels",
+        "type": "hotel count",
+        "evidence": "At one time there were three flourishing hotels on"
+      }
+    ],
+    "relations": [
+      {
+        "source": "e1",
+        "predicate": "was",
+        "target": "e2",
+        "evidence": "It was a frame building, four stories high and nicely situated."
+      },
+      {
+        "source": "e1",
+        "predicate": "intended to be",
+        "target": "e3",
+        "evidence": "The proprietors of it intended it should be a family hotel"
+      },
+      {
+        "source": "e1",
+        "predicate": "was burned to the ground on",
+        "target": "e7",
+        "evidence": "on the 19th of May, 1878, it was burned to the ground"
+      },
+      {
+        "source": "e1",
+        "predicate": "was unoccupied when burned",
+        "target": "e7",
+        "evidence": "when, on the 19th of May, 1878, it was burned to the ground it was unoccupied"
+      },
+      {
+        "source": "e1",
+        "predicate": "was thought to be caused by",
+        "target": "e9",
+        "evidence": "The fire was thought to be the work of incendiaries"
+      },
+      {
+        "source": "e1",
+        "predicate": "had loss of",
+        "target": "e10",
+        "evidence": "The loss was about $20,000"
+      },
+      {
+        "source": "e1",
+        "predicate": "was partially insured",
+        "target": "e11",
+        "evidence": "partially insured"
+      },
+      {
+        "source": "e12",
+        "predicate": "were injured in",
+        "target": "e8",
+        "evidence": "Four firemen were quite seriously injured at this fire, but all recovered."
+      },
+      {
+        "source": "e12",
+        "predicate": "recovered from",
+        "target": "e8",
+        "evidence": "but all recovered"
+      },
+      {
+        "source": "e4",
+        "predicate": "was built by",
+        "target": "e5",
+        "evidence": "The Carpenter house, on the corner of Summit avenue and Ramsey street, was built by Warren Carpenter."
+      },
+      {
+        "source": "e5",
+        "predicate": "had colossal ideas",
+        "target": "e19",
+        "evidence": "Mr. Carpenter was a man of colossal ideas"
+      },
+      {
+        "source": "e5",
+        "predicate": "could see",
+        "target": "e18",
+        "evidence": "he could see millions of tourists flocking to his hostelry"
+      },
+      {
+        "source": "e4",
+        "predicate": "was located at",
+        "target": "e6",
+        "evidence": "The Carpenter house, on the corner of Summit avenue and Ramsey street"
+      },
+      {
+        "source": "e14",
+        "predicate": "followed by",
+        "target": "e15",
+        "evidence": "The panic of 1857, soon followed by the great Civil war"
+      },
+      {
+        "source": "e16",
+        "predicate": "was put on quietus by",
+        "target": "e14",
+        "evidence": "The panic of 1857, soon followed by the great Civil war, put a quietus on immigration"
+      },
+      {
+        "source": "e5",
+        "predicate": "was stranded at",
+        "target": "e17",
+        "evidence": "left him stranded high on the beach"
+      },
+      {
+        "source": "e4",
+        "predicate": "was burned to ground on",
+        "target": "e20",
+        "evidence": "on the 26th of January, 1879, the hotel was burned to the ground"
+      },
+      {
+        "source": "e4",
+        "predicate": "had passed beyond control by",
+        "target": "e22",
+        "evidence": "it had for some time previous passed beyond his control"
+      },
+      {
+        "source": "e13",
+        "predicate": "was recovered from",
+        "target": "e8",
+        "evidence": "but all recovered"
+      },
+      {
+        "source": "e23",
+        "predicate": "existed at one time with",
+        "target": "e4",
+        "evidence": "At one time there were three flourishing hotels on"
+      }
+    ]
+  },
+  "automatic_errors": [
+    "entities:4:evidence mismatch"
+  ],
+  "elapsed_seconds": 107.99157087499043
+}

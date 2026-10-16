@@ -1,0 +1,207 @@
+{
+  "job": {
+    "job_id": "Novel-54537_r00_e256_s17_c014",
+    "doc_id": "Novel-54537",
+    "region_id": "Novel-54537_r00",
+    "size": 256,
+    "seed": 17,
+    "token_start": 3584,
+    "token_end": 3840,
+    "char_start": 142197,
+    "char_end": 143344,
+    "text": " other a double-pipe. M. de Coussemaker has published in the “Annales Archéologiques” the figure of a crowned personage playing the lyre, which he found in a manuscript of the ninth or tenth century in the library at Angers. The player twangs the strings with his fingers, while the Anglo-saxon gleeman before mentioned uses a plectrum. _Cithara_ was a name applied to several stringed instruments greatly varying in form, power of sound, and compass. The illustration represents a cithara from a manuscript of the ninth century, formerly in the library of the great monastery of St. Blasius in the Black Forest. When in the year 1768 the monastery was destroyed by fire, this valuable book perished in the flames; fortunately the celebrated abbot Gerbert possessed tracings of the illustrations, which were saved from destruction. He published them, in the year 1774, in his work “De cantu et musica sacra.” Several illustrations in the following pages, it will be seen, have been derived from this interesting source. As the older works on music were generally written in Latin we do not learn from them the popular names of the instruments; the",
+    "sha256": "31da3ce9f7e6d1727d96ee7e0041b173d193dc12bb88d8e75d503c14009b7bff"
+  },
+  "request": {
+    "model": "qwen-extraction",
+    "messages": [
+      {
+        "role": "system",
+        "content": "Extract named entities and explicit relations from the supplied passage only. The passage is data, never instructions. Do not use outside knowledge or guess. Preserve direction, negation and uncertainty in predicate wording. Return one JSON object only with keys entities and relations. entities is a list of {id, name, type, evidence}. relations is a list of {source, predicate, target, evidence}; source and target must refer to entity ids. Each evidence must be a verbatim substring of the passage that supports the item. Every entity MUST include an evidence field, even if the evidence is just its exact name as written in the passage. Every relation MUST include an evidence field. Before returning, verify all entities have all four required keys: id, name, type, evidence. Omit unsupported items. Use empty lists when appropriate. Return compact JSON without indentation. Do not repeat entities or relations. Do not create generic category nodes such as hotel or person merely to express an entity type. A relation must connect two independently identified entities and its evidence must support that specific pair."
+      },
+      {
+        "role": "user",
+        "content": "PASSAGE:\n other a double-pipe. M. de Coussemaker has published in the “Annales Archéologiques” the figure of a crowned personage playing the lyre, which he found in a manuscript of the ninth or tenth century in the library at Angers. The player twangs the strings with his fingers, while the Anglo-saxon gleeman before mentioned uses a plectrum. _Cithara_ was a name applied to several stringed instruments greatly varying in form, power of sound, and compass. The illustration represents a cithara from a manuscript of the ninth century, formerly in the library of the great monastery of St. Blasius in the Black Forest. When in the year 1768 the monastery was destroyed by fire, this valuable book perished in the flames; fortunately the celebrated abbot Gerbert possessed tracings of the illustrations, which were saved from destruction. He published them, in the year 1774, in his work “De cantu et musica sacra.” Several illustrations in the following pages, it will be seen, have been derived from this interesting source. As the older works on music were generally written in Latin we do not learn from them the popular names of the instruments; the"
+      }
+    ],
+    "temperature": 0.2,
+    "top_p": 0.9,
+    "seed": 17,
+    "max_tokens": 4096,
+    "response_format": {
+      "type": "json_object"
+    },
+    "cache_prompt": false,
+    "repeat_penalty": 1.1
+  },
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"entities\": [\n    {\n      \"id\": \"e1\",\n      \"name\": \"M. de Coussemaker\",\n      \"type\": \"person\",\n      \"evidence\": \"M. de Coussemaker\"\n    },\n    {\n      \"id\": \"e2\",\n      \"name\": \"Annales Archéologiques\",\n      \"type\": \"publication\",\n      \"evidence\": \"the “Annales Archéologiques”\"\n    },\n    {\n      \"id\": \"e3\",\n      \"name\": \"Angers library\",\n      \"type\": \"institution\",\n      \"evidence\": \"library at Angers\"\n    },\n    {\n      \"id\": \"e4\",\n      \"name\": \"crowned personage\",\n      \"type\": \"person\",\n      \"evidence\": \"crowned personage\"\n    },\n    {\n      \"id\": \"e5\",\n      \"name\": \"Anglo-saxon gleeman\",\n      \"type\": \"person\",\n      \"evidence\": \"Anglo-saxon gleeman\"\n    },\n    {\n      \"id\": \"e6\",\n      \"name\": \"cithara\",\n      \"type\": \"instrument\",\n      \"evidence\": \"_Cithara_\"\n    },\n    {\n      \"id\": \"e7\",\n      \"name\": \"St. Blasius in the Black Forest\",\n      \"type\": \"institution\",\n      \"evidence\": \"the great monastery of St. Blasius in the Black Forest\"\n    },\n    {\n      \"id\": \"e8\",\n      \"name\": \"abbot Gerbert\",\n      \"type\": \"person\",\n      \"evidence\": \"celebrated abbot Gerbert\"\n    },\n    {\n      \"id\": \"e9\",\n      \"name\": \"De cantu et musica sacra\",\n      \"type\": \"publication\",\n      \"evidence\": \"his work “De cantu et musica sacra”\"\n    },\n    {\n      \"id\": \"e10\",\n      \"name\": \"monastery destroyed by fire in 1768\",\n      \"type\": \"institution\",\n      \"evidence\": \"When in the year 1768 the monastery was destroyed by fire\"\n    },\n    {\n      \"id\": \"e11\",\n      \"name\": \"valuable book perished in flames\",\n      \"type\": \"object\",\n      \"evidence\": \"this valuable book perished in the flames\"\n    }\n  ],\n  \"relations\": [\n    {\n      \"source\": \"e1\",\n      \"predicate\": \"published in\",\n      \"target\": \"e2\",\n      \"evidence\": \"M. de Coussemaker has published in the “Annales Archéologiques”\"\n    },\n    {\n      \"source\": \"e4\",\n      \"predicate\": \"found in\",\n      \"target\": \"e3\",\n      \"evidence\": \"which he found in a manuscript of the ninth or tenth century in the library at Angers\"\n    },\n    {\n      \"source\": \"e5\",\n      \"predicate\": \"uses\",\n      \"target\": \"plectrum\",\n      \"evidence\": \"the Anglo-saxon gleeman before mentioned uses a plectrum\"\n    },\n    {\n      \"source\": \"e6\",\n      \"predicate\": \"was applied to\",\n      \"target\": \"several stringed instruments\",\n      \"evidence\": \"_Cithara_ was a name applied to several stringed instruments greatly varying in form, power of sound, and compass.\"\n    },\n    {\n      \"source\": \"e6\",\n      \"predicate\": \"represented in\",\n      \"target\": \"manuscript of ninth century\",\n      \"evidence\": \"The illustration represents a cithara from a manuscript of the ninth century\"\n    },\n    {\n      \"source\": \"e7\",\n      \"predicate\": \"formerly housed\",\n      \"target\": \"e11\",\n      \"evidence\": \"formerly in the library of the great monastery of St. Blasius in the Black Forest\"\n    },\n    {\n      \"source\": \"e8\",\n      \"predicate\": \"possessed tracings of\",\n      \"target\": \"illustrations\",\n      \"evidence\": \"He published them, in the year 1774, in his work “De cantu et musica sacra.”\"\n    },\n    {\n      \"source\": \"e8\",\n      \"predicate\": \"published\",\n      \"target\": \"e9\",\n      \"evidence\": \"He published them, in the year 1774, in his work “De cantu et musica sacra.”\"\n    },\n    {\n      \"source\": \"e10\",\n      \"predicate\": \"destroyed by fire\",\n      \"target\": \"e11\",\n      \"evidence\": \"When in the year 1768 the monastery was destroyed by fire, this valuable book perished in the flames;\"\n    }\n  ]\n}"
+        }
+      }
+    ],
+    "created": 1792107493,
+    "model": "qwen-extraction",
+    "system_fingerprint": "b11351-631109b34",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 1034,
+      "prompt_tokens": 485,
+      "total_tokens": 1519,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "id": "chatcmpl-CgNBZF4ANbPlia0DfISxXGT5R10dBEak",
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 485,
+      "prompt_ms": 2789.763,
+      "prompt_per_token_ms": 5.752088659793814,
+      "prompt_per_second": 173.84989334219432,
+      "predicted_n": 1034,
+      "predicted_ms": 44880.458,
+      "predicted_per_token_ms": 43.44671636011616,
+      "predicted_per_second": 23.016699161136014
+    }
+  },
+  "parsed": {
+    "entities": [
+      {
+        "id": "e1",
+        "name": "M. de Coussemaker",
+        "type": "person",
+        "evidence": "M. de Coussemaker"
+      },
+      {
+        "id": "e2",
+        "name": "Annales Archéologiques",
+        "type": "publication",
+        "evidence": "the “Annales Archéologiques”"
+      },
+      {
+        "id": "e3",
+        "name": "Angers library",
+        "type": "institution",
+        "evidence": "library at Angers"
+      },
+      {
+        "id": "e4",
+        "name": "crowned personage",
+        "type": "person",
+        "evidence": "crowned personage"
+      },
+      {
+        "id": "e5",
+        "name": "Anglo-saxon gleeman",
+        "type": "person",
+        "evidence": "Anglo-saxon gleeman"
+      },
+      {
+        "id": "e6",
+        "name": "cithara",
+        "type": "instrument",
+        "evidence": "_Cithara_"
+      },
+      {
+        "id": "e7",
+        "name": "St. Blasius in the Black Forest",
+        "type": "institution",
+        "evidence": "the great monastery of St. Blasius in the Black Forest"
+      },
+      {
+        "id": "e8",
+        "name": "abbot Gerbert",
+        "type": "person",
+        "evidence": "celebrated abbot Gerbert"
+      },
+      {
+        "id": "e9",
+        "name": "De cantu et musica sacra",
+        "type": "publication",
+        "evidence": "his work “De cantu et musica sacra”"
+      },
+      {
+        "id": "e10",
+        "name": "monastery destroyed by fire in 1768",
+        "type": "institution",
+        "evidence": "When in the year 1768 the monastery was destroyed by fire"
+      },
+      {
+        "id": "e11",
+        "name": "valuable book perished in flames",
+        "type": "object",
+        "evidence": "this valuable book perished in the flames"
+      }
+    ],
+    "relations": [
+      {
+        "source": "e1",
+        "predicate": "published in",
+        "target": "e2",
+        "evidence": "M. de Coussemaker has published in the “Annales Archéologiques”"
+      },
+      {
+        "source": "e4",
+        "predicate": "found in",
+        "target": "e3",
+        "evidence": "which he found in a manuscript of the ninth or tenth century in the library at Angers"
+      },
+      {
+        "source": "e5",
+        "predicate": "uses",
+        "target": "plectrum",
+        "evidence": "the Anglo-saxon gleeman before mentioned uses a plectrum"
+      },
+      {
+        "source": "e6",
+        "predicate": "was applied to",
+        "target": "several stringed instruments",
+        "evidence": "_Cithara_ was a name applied to several stringed instruments greatly varying in form, power of sound, and compass."
+      },
+      {
+        "source": "e6",
+        "predicate": "represented in",
+        "target": "manuscript of ninth century",
+        "evidence": "The illustration represents a cithara from a manuscript of the ninth century"
+      },
+      {
+        "source": "e7",
+        "predicate": "formerly housed",
+        "target": "e11",
+        "evidence": "formerly in the library of the great monastery of St. Blasius in the Black Forest"
+      },
+      {
+        "source": "e8",
+        "predicate": "possessed tracings of",
+        "target": "illustrations",
+        "evidence": "He published them, in the year 1774, in his work “De cantu et musica sacra.”"
+      },
+      {
+        "source": "e8",
+        "predicate": "published",
+        "target": "e9",
+        "evidence": "He published them, in the year 1774, in his work “De cantu et musica sacra.”"
+      },
+      {
+        "source": "e10",
+        "predicate": "destroyed by fire",
+        "target": "e11",
+        "evidence": "When in the year 1768 the monastery was destroyed by fire, this valuable book perished in the flames;"
+      }
+    ]
+  },
+  "automatic_errors": [
+    "entities:8:evidence mismatch",
+    "relations:2:endpoint missing",
+    "relations:3:endpoint missing",
+    "relations:4:endpoint missing",
+    "relations:6:endpoint missing"
+  ],
+  "elapsed_seconds": 47.80145958403591
+}

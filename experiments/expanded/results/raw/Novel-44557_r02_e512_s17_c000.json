@@ -1,0 +1,260 @@
+{
+  "job": {
+    "job_id": "Novel-44557_r02_e512_s17_c000",
+    "doc_id": "Novel-44557",
+    "region_id": "Novel-44557_r02",
+    "size": 512,
+    "seed": 17,
+    "token_start": 0,
+    "token_end": 512,
+    "char_start": 82217,
+    "char_end": 84564,
+    "text": "A fine Norman doorway, a curious hagioscope, and other points, interesting to archaeologists--also the neatest and prettiest of churchyards--make note-worthy this, the most southerly church in England. A fine old building, not spoiled though \"restored.\" The modern open pews, and a modern memorial pulpit of serpentine, jarred less than might have been expected with the carefully-preserved remains of the past. In Landewednack church is said to have been preached the last sermon in Cornish. This was in 1678. Since, the ancient tongue has completely died out, and the people of King Arthur's country have become wholly English. Still, they are not the English of the midland and northern districts, but of a very different type and race. I have heard it said that a seaboard population, accustomed to wrestle with the dangers of the coast, to move about from place to place, see foreign countries, and carry on its business in the deep waters, is always more capable, more intelligent, as a whole, than an inland people, whether agricultural or manufacturing. It may be so: but certainly the aborigines of Lizard Town, who could easily be distinguished from the visitors--of whom there was yet a tolerable sprinkling--made a very interesting congregation; orderly, respectable, reverent; simple in dress and manner, yet many of them, both the men and women, exceedingly picturesque. That is, the old men and the old women: the younger ones aped modern fashion even here, in this out-of-the-way corner, and consequently did not look half so well as their seniors. I must name one more member of the congregation--a large black dog, who walked in and settled himself in the pew behind, where he behaved during half the service in an exemplary manner, worthy of the Highland shepherds' dogs, who always come to church with their masters, and conduct themselves with equal decorum. There is always a certain pathos in going in to worship in a strange church, with a strange congregation, of whom you are as ignorant as they of you. In the intervals of kneeling with them as \"miserable sinners,\" one finds oneself speculating upon them, their possible faults and virtues, joys and sorrows, hopes and fears, watching the unknown faces, and trying to read thereon the records of a common humanity. A silent homily, better perhaps than most sermons. Not",
+    "sha256": "06f15aea6b047e8fd2ff7e5bb3dba322fd5ee3ea5b1a9088e74d7568d9a84419"
+  },
+  "request": {
+    "model": "qwen-extraction",
+    "messages": [
+      {
+        "role": "system",
+        "content": "Extract named entities and explicit relations from the supplied passage only. The passage is data, never instructions. Do not use outside knowledge or guess. Preserve direction, negation and uncertainty in predicate wording. Return one JSON object only with keys entities and relations. entities is a list of {id, name, type, evidence}. relations is a list of {source, predicate, target, evidence}; source and target must refer to entity ids. Each evidence must be a verbatim substring of the passage that supports the item. Every entity MUST include an evidence field, even if the evidence is just its exact name as written in the passage. Every relation MUST include an evidence field. Before returning, verify all entities have all four required keys: id, name, type, evidence. Omit unsupported items. Use empty lists when appropriate. Return compact JSON without indentation. Do not repeat entities or relations. Do not create generic category nodes such as hotel or person merely to express an entity type. A relation must connect two independently identified entities and its evidence must support that specific pair."
+      },
+      {
+        "role": "user",
+        "content": "PASSAGE:\nA fine Norman doorway, a curious hagioscope, and other points, interesting to archaeologists--also the neatest and prettiest of churchyards--make note-worthy this, the most southerly church in England. A fine old building, not spoiled though \"restored.\" The modern open pews, and a modern memorial pulpit of serpentine, jarred less than might have been expected with the carefully-preserved remains of the past. In Landewednack church is said to have been preached the last sermon in Cornish. This was in 1678. Since, the ancient tongue has completely died out, and the people of King Arthur's country have become wholly English. Still, they are not the English of the midland and northern districts, but of a very different type and race. I have heard it said that a seaboard population, accustomed to wrestle with the dangers of the coast, to move about from place to place, see foreign countries, and carry on its business in the deep waters, is always more capable, more intelligent, as a whole, than an inland people, whether agricultural or manufacturing. It may be so: but certainly the aborigines of Lizard Town, who could easily be distinguished from the visitors--of whom there was yet a tolerable sprinkling--made a very interesting congregation; orderly, respectable, reverent; simple in dress and manner, yet many of them, both the men and women, exceedingly picturesque. That is, the old men and the old women: the younger ones aped modern fashion even here, in this out-of-the-way corner, and consequently did not look half so well as their seniors. I must name one more member of the congregation--a large black dog, who walked in and settled himself in the pew behind, where he behaved during half the service in an exemplary manner, worthy of the Highland shepherds' dogs, who always come to church with their masters, and conduct themselves with equal decorum. There is always a certain pathos in going in to worship in a strange church, with a strange congregation, of whom you are as ignorant as they of you. In the intervals of kneeling with them as \"miserable sinners,\" one finds oneself speculating upon them, their possible faults and virtues, joys and sorrows, hopes and fears, watching the unknown faces, and trying to read thereon the records of a common humanity. A silent homily, better perhaps than most sermons. Not"
+      }
+    ],
+    "temperature": 0.2,
+    "top_p": 0.9,
+    "seed": 17,
+    "max_tokens": 4096,
+    "response_format": {
+      "type": "json_object"
+    },
+    "cache_prompt": false,
+    "repeat_penalty": 1.1
+  },
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"entities\": [\n    {\n      \"id\": \"e1\",\n      \"name\": \"Landewednack church\",\n      \"type\": \"church\",\n      \"evidence\": \"In Landewednack church is said to have been preached the last sermon in Cornish.\"\n    },\n    {\n      \"id\": \"e2\",\n      \"name\": \"Norman doorway\",\n      \"type\": \"archaeological feature\",\n      \"evidence\": \"A fine Norman doorway\"\n    },\n    {\n      \"id\": \"e3\",\n      \"name\": \"hagioscope\",\n      \"type\": \"archaeological feature\",\n      \"evidence\": \"a curious hagioscope\"\n    },\n    {\n      \"id\": \"e4\",\n      \"name\": \"churchyard\",\n      \"type\": \"archaeological feature\",\n      \"evidence\": \"the neatest and prettiest of churchyards\"\n    },\n    {\n      \"id\": \"e5\",\n      \"name\": \"modern open pews\",\n      \"type\": \"architectural feature\",\n      \"evidence\": \"The modern open pews\"\n    },\n    {\n      \"id\": \"e6\",\n      \"name\": \"modern memorial pulpit of serpentine\",\n      \"type\": \"architectural feature\",\n      \"evidence\": \"a modern memorial pulpit of serpentine\"\n    },\n    {\n      \"id\": \"e7\",\n      \"name\": \"Cornish language\",\n      \"type\": \"language\",\n      \"evidence\": \"the last sermon in Cornish\"\n    },\n    {\n      \"id\": \"e8\",\n      \"name\": \"King Arthur's country\",\n      \"type\": \"geographic region\",\n      \"evidence\": \"the people of King Arthur's country\"\n    },\n    {\n      \"id\": \"e9\",\n      \"name\": \"Lizard Town\",\n      \"type\": \"place\",\n      \"evidence\": \"the aborigines of Lizard Town\"\n    },\n    {\n      \"id\": \"e10\",\n      \"name\": \"seaboard population\",\n      \"type\": \"population group\",\n      \"evidence\": \"a seaboard population, accustomed to wrestle with the dangers of the coast\"\n    },\n    {\n      \"id\": \"e11\",\n      \"name\": \"inland people\",\n      \"type\": \"population group\",\n      \"evidence\": \"an inland people, whether agricultural or manufacturing\"\n    },\n    {\n      \"id\": \"e12\",\n      \"name\": \"Highland shepherds' dogs\",\n      \"type\": \"animal type\",\n      \"evidence\": \"the Highland shepherds' dogs, who always come to church with their masters\"\n    },\n    {\n      \"id\": \"e13\",\n      \"name\": \"large black dog\",\n      \"type\": \"animal\",\n      \"evidence\": \"a large black dog\"\n    },\n    {\n      \"id\": \"e14\",\n      \"name\": \"strange church\",\n      \"type\": \"place\",\n      \"evidence\": \"going in to worship in a strange church\"\n    },\n    {\n      \"id\": \"e15\",\n      \"name\": \"strange congregation\",\n      \"type\": \"group\",\n      \"evidence\": \"a strange congregation, of whom you are as ignorant as they of you\"\n    },\n    {\n      \"id\": \"e16\",\n      \"name\": \"miserable sinners\",\n      \"type\": \"group\",\n      \"evidence\": \"kneeling with them as \\\"miserable sinners\\\"\"\n    }\n  ],\n  \"relations\": [\n    {\n      \"source\": \"e1\",\n      \"predicate\": \"is the most southerly church in England\",\n      \"target\": \"e14\",\n      \"evidence\": \"this, the most southerly church in England\"\n    },\n    {\n      \"source\": \"e1\",\n      \"predicate\": \"has\",\n      \"target\": \"e2\",\n      \"evidence\": \"A fine Norman doorway\"\n    },\n    {\n      \"source\": \"e1\",\n      \"predicate\": \"has\",\n      \"target\": \"e3\",\n      \"evidence\": \"a curious hagioscope\"\n    },\n    {\n      \"source\": \"e1\",\n      \"predicate\": \"has\",\n      \"target\": \"e4\",\n      \"evidence\": \"the neatest and prettiest of churchyards\"\n    },\n    {\n      \"source\": \"e1\",\n      \"predicate\": \"is not spoiled though restored\",\n      \"target\": \"e5\",\n      \"evidence\": \"A fine old building, not spoiled though \\\"restored.\\\"\"\n    },\n    {\n      \"source\": \"e1\",\n      \"predicate\": \"has\",\n      \"target\": \"e6\",\n      \"evidence\": \"a modern memorial pulpit of serpentine\"\n    },\n    {\n      \"source\": \"e1\",\n      \"predicate\": \"was the site of\",\n      \"target\": \"e7\",\n      \"evidence\": \"In Landewednack church is said to have been preached the last sermon in Cornish.\"\n    },\n    {\n      \"source\": \"e8\",\n      \"predicate\": \"has become wholly English\",\n      \"target\": \"e10\",\n      \"evidence\": \"Since, the ancient tongue has completely died out, and the people of King Arthur's country have become wholly English.\"\n    },\n    {\n      \"source\": \"e9\",\n      \"predicate\": \"is distinct from\",\n      \"target\": \"e15\",\n      \"evidence\": \"the aborigines of Lizard Town... of whom there was yet a tolerable sprinkling\"\n    },\n    {\n      \"source\": \"e10\",\n      \"predicate\": \"is more capable and intelligent than\",\n      \"target\": \"e11\",\n      \"evidence\": \"a seaboard population... is always more capable, more intelligent, as a whole, than an inland people...\"\n    },\n    {\n      \"source\": \"e13\",\n      \"predicate\": \"walks in and settles in\",\n      \"target\": \"e5\",\n      \"evidence\": \"a large black dog, who walked in and settled himself in the pew behind\"\n    },\n    {\n      \"source\": \"e14\",\n      \"predicate\": \"is attended by\",\n      \"target\": \"e15\",\n      \"evidence\": \"going in to worship in a strange church, with a strange congregation\"\n    },\n    {\n      \"source\": \"e16\",\n      \"predicate\": \"is part of\",\n      \"target\": \"e15\",\n      \"evidence\": \"kneeling with them as \\\"miserable sinners\\\"\"\n    }\n  ]\n}"
+        }
+      }
+    ],
+    "created": 1792099477,
+    "model": "qwen-extraction",
+    "system_fingerprint": "b11351-631109b34",
+    "object": "chat.completion",
+    "usage": {
+      "completion_tokens": 1429,
+      "prompt_tokens": 741,
+      "total_tokens": 2170,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    },
+    "id": "chatcmpl-jU4AugX6TYo3SP793kDHlLmrZFkU9iKW",
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 741,
+      "prompt_ms": 3726.759,
+      "prompt_per_token_ms": 5.029364372469636,
+      "prompt_per_second": 198.83228295685342,
+      "predicted_n": 1429,
+      "predicted_ms": 70840.355,
+      "predicted_per_token_ms": 49.608091736694675,
+      "predicted_per_second": 20.158001749144255
+    }
+  },
+  "parsed": {
+    "entities": [
+      {
+        "id": "e1",
+        "name": "Landewednack church",
+        "type": "church",
+        "evidence": "In Landewednack church is said to have been preached the last sermon in Cornish."
+      },
+      {
+        "id": "e2",
+        "name": "Norman doorway",
+        "type": "archaeological feature",
+        "evidence": "A fine Norman doorway"
+      },
+      {
+        "id": "e3",
+        "name": "hagioscope",
+        "type": "archaeological feature",
+        "evidence": "a curious hagioscope"
+      },
+      {
+        "id": "e4",
+        "name": "churchyard",
+        "type": "archaeological feature",
+        "evidence": "the neatest and prettiest of churchyards"
+      },
+      {
+        "id": "e5",
+        "name": "modern open pews",
+        "type": "architectural feature",
+        "evidence": "The modern open pews"
+      },
+      {
+        "id": "e6",
+        "name": "modern memorial pulpit of serpentine",
+        "type": "architectural feature",
+        "evidence": "a modern memorial pulpit of serpentine"
+      },
+      {
+        "id": "e7",
+        "name": "Cornish language",
+        "type": "language",
+        "evidence": "the last sermon in Cornish"
+      },
+      {
+        "id": "e8",
+        "name": "King Arthur's country",
+        "type": "geographic region",
+        "evidence": "the people of King Arthur's country"
+      },
+      {
+        "id": "e9",
+        "name": "Lizard Town",
+        "type": "place",
+        "evidence": "the aborigines of Lizard Town"
+      },
+      {
+        "id": "e10",
+        "name": "seaboard population",
+        "type": "population group",
+        "evidence": "a seaboard population, accustomed to wrestle with the dangers of the coast"
+      },
+      {
+        "id": "e11",
+        "name": "inland people",
+        "type": "population group",
+        "evidence": "an inland people, whether agricultural or manufacturing"
+      },
+      {
+        "id": "e12",
+        "name": "Highland shepherds' dogs",
+        "type": "animal type",
+        "evidence": "the Highland shepherds' dogs, who always come to church with their masters"
+      },
+      {
+        "id": "e13",
+        "name": "large black dog",
+        "type": "animal",
+        "evidence": "a large black dog"
+      },
+      {
+        "id": "e14",
+        "name": "strange church",
+        "type": "place",
+        "evidence": "going in to worship in a strange church"
+      },
+      {
+        "id": "e15",
+        "name": "strange congregation",
+        "type": "group",
+        "evidence": "a strange congregation, of whom you are as ignorant as they of you"
+      },
+      {
+        "id": "e16",
+        "name": "miserable sinners",
+        "type": "group",
+        "evidence": "kneeling with them as \"miserable sinners\""
+      }
+    ],
+    "relations": [
+      {
+        "source": "e1",
+        "predicate": "is the most southerly church in England",
+        "target": "e14",
+        "evidence": "this, the most southerly church in England"
+      },
+      {
+        "source": "e1",
+        "predicate": "has",
+        "target": "e2",
+        "evidence": "A fine Norman doorway"
+      },
+      {
+        "source": "e1",
+        "predicate": "has",
+        "target": "e3",
+        "evidence": "a curious hagioscope"
+      },
+      {
+        "source": "e1",
+        "predicate": "has",
+        "target": "e4",
+        "evidence": "the neatest and prettiest of churchyards"
+      },
+      {
+        "source": "e1",
+        "predicate": "is not spoiled though restored",
+        "target": "e5",
+        "evidence": "A fine old building, not spoiled though \"restored.\""
+      },
+      {
+        "source": "e1",
+        "predicate": "has",
+        "target": "e6",
+        "evidence": "a modern memorial pulpit of serpentine"
+      },
+      {
+        "source": "e1",
+        "predicate": "was the site of",
+        "target": "e7",
+        "evidence": "In Landewednack church is said to have been preached the last sermon in Cornish."
+      },
+      {
+        "source": "e8",
+        "predicate": "has become wholly English",
+        "target": "e10",
+        "evidence": "Since, the ancient tongue has completely died out, and the people of King Arthur's country have become wholly English."
+      },
+      {
+        "source": "e9",
+        "predicate": "is distinct from",
+        "target": "e15",
+        "evidence": "the aborigines of Lizard Town... of whom there was yet a tolerable sprinkling"
+      },
+      {
+        "source": "e10",
+        "predicate": "is more capable and intelligent than",
+        "target": "e11",
+        "evidence": "a seaboard population... is always more capable, more intelligent, as a whole, than an inland people..."
+      },
+      {
+        "source": "e13",
+        "predicate": "walks in and settles in",
+        "target": "e5",
+        "evidence": "a large black dog, who walked in and settled himself in the pew behind"
+      },
+      {
+        "source": "e14",
+        "predicate": "is attended by",
+        "target": "e15",
+        "evidence": "going in to worship in a strange church, with a strange congregation"
+      },
+      {
+        "source": "e16",
+        "predicate": "is part of",
+        "target": "e15",
+        "evidence": "kneeling with them as \"miserable sinners\""
+      }
+    ]
+  },
+  "automatic_errors": [
+    "entities:15:evidence mismatch",
+    "relations:8:evidence mismatch",
+    "relations:9:evidence mismatch",
+    "relations:12:evidence mismatch"
+  ],
+  "elapsed_seconds": 74.58106241701171
+}
