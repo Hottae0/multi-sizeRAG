@@ -1,5 +1,7 @@
 # multi-sizeRAG
 
+> **Experiment 1 (2026-10-19):** [실행·재현 안내](experiments/experiment1/README.md), [연구 흐름 1–6](docs/Experiment1_연구설계.md), [기존 1,140개 출력 재분석과 테스트](experiments/experiment1/results/검증기록.md). 원본 보존, 4크기 single-pass, 검토 기반 의미 정렬, provenance graph와 상호보완성 평가를 별도 패키지로 추가했다. 새 모델 실추론 및 실제 corpus 의미 판정은 아직 수행하지 않았다.
+
 **같은 문서라도 청크 크기가 다르면, 서로 보완할 수 있는 유효한 entity와 relation이 추출될까?**
 
 이 저장소는 여러 크기의 청크에서 추출한 지식을 통합하는 GraphRAG 아이디어의 전제를 확인하기 위한 탐색 실험이다. 현재는 동일 원문의 청킹, Qwen 기반 entity·relation 추출, 결과 비교와 오류 분석까지 진행했다. 여러 그래프를 통합한 검색 시스템이나 QA 성능 개선을 구현·검증한 단계는 아니다.
