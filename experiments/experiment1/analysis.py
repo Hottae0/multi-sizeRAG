@@ -13,13 +13,14 @@ def load(run):
     m = validate_manifest(read(run / 'manifest.json'))
     legacy = m.get('version') != 'experiment1-v1'
     nodes, facts, status, raw_hashes = {}, {}, [], {}
+    manifest_hash = digest(m)
     for j in m['jobs']:
         p = run / 'raw' / (j['job_id'] + '.json')
         r = read(p) if p.exists() else None
         if r is not None:
             if r.get('job') != j:
                 raise ValueError('Raw job differs from manifest: ' + j['job_id'])
-            if not legacy and r.get('manifest_hash') != digest(m):
+            if not legacy and r.get('manifest_hash') != manifest_hash:
                 raise ValueError('Raw protocol differs from manifest')
             raw_hashes[j['job_id']] = sha(p.read_text())
         parsed = parse_record(j, r, legacy)
@@ -31,10 +32,14 @@ def load(run):
             nodes[n['occurrence_id']] = dict(n, **context)
         for f in parsed.pop('relations'):
             facts[f['occurrence_id']] = dict(f, **context)
-        usage = (r or {}).get('response', {}).get('usage') or {}
+        response = (r or {}).get('response')
+        response = response if isinstance(response, dict) else {}
+        usage = response.get('usage') or {}
+        usage = usage if isinstance(usage, dict) else {}
         valid_usage = all(isinstance(usage.get(k), (int, float)) and usage[k] >= 0
                           for k in ('prompt_tokens', 'completion_tokens'))
         status.append(dict(context, **parsed, recorded=r is not None,
+                           server_telemetry=response.get('telemetry'),
                            elapsed_seconds=(r or {}).get('elapsed_seconds'),
                            prompt_tokens=usage.get('prompt_tokens') if valid_usage else None,
                            completion_tokens=usage.get('completion_tokens') if valid_usage else None,
@@ -149,7 +154,7 @@ def jaccard(a, b):
     return len(a & b) / len(a | b) if a | b else None
 
 
-def structure(g):
+def structure(g, max_paths=None):
     nodes, edges = set(g['nodes']), g['edges'].values()
     adjacency = {n: set() for n in nodes}
     undirected = {n: set() for n in nodes}
@@ -169,17 +174,38 @@ def structure(g):
                     labels[v] = components
                     stack.append(v)
         components += 1
-    paths = {(a, b, c) for a in nodes for b in adjacency[a] for c in adjacency[b] if len({a, b, c}) == 3}
+    paths = set()
+    for a in nodes:
+        for b in adjacency[a]:
+            for c in adjacency[b]:
+                if len({a, b, c}) == 3:
+                    paths.add((a, b, c))
+                    if max_paths is not None and len(paths) > max_paths:
+                        paths = None
+                        break
+            if paths is None:
+                break
+        if paths is None:
+            break
     return labels, paths, dict(nodes=len(nodes), edges=len(g['edges']), weak_components=components,
-                               isolated_nodes=sum(not undirected[n] for n in nodes), directed_two_hop_paths=len(paths))
+                               isolated_nodes=sum(not undirected[n] for n in nodes), directed_two_hop_paths=len(paths) if paths is not None else None,
+                               paths_capped=paths is None)
 
 
-def compare(a, b):
+def span_length(spans):
+    total, end = 0, -1
+    for lo, hi in sorted(spans):
+        total += max(0, hi - max(lo, end))
+        end = max(end, hi)
+    return total
+
+
+def compare(a, b, max_paths=None):
     an, bn, ae, be = set(a['nodes']), set(b['nodes']), set(a['edges']), set(b['edges'])
     union = dict(nodes={**a['nodes'], **b['nodes']}, edges={**a['edges'], **b['edges']})
-    labels, pa, sa = structure(a)
-    _, pb, sb = structure(b)
-    _, pu, su = structure(union)
+    labels, pa, sa = structure(a, max_paths)
+    _, pb, sb = structure(b, max_paths)
+    _, pu, su = structure(union, max_paths)
     shared_evidence, novel_evidence = 0, 0
     novel_chars = 0
     for key in ae & be:
@@ -187,16 +213,14 @@ def compare(a, b):
         shared_evidence += len(av & bv)
         novel_evidence += len(bv - av)
         # New span boundaries alone do not prove new evidence; also report uncovered characters.
-        ac = {i for lo, hi in av for i in range(lo, hi)}
-        bc = {i for lo, hi in bv for i in range(lo, hi)}
-        novel_chars += len(bc - ac)
+        novel_chars += span_length(av | bv) - span_length(av)
     bridges = sum(e['source'] in labels and e['target'] in labels and
                   labels[e['source']] != labels[e['target']] for k, e in b['edges'].items() if k not in ae)
     return dict(node_jaccard=jaccard(an, bn), edge_jaccard=jaccard(ae, be),
                 novel_nodes_b_minus_a=len(bn - an), novel_edges_b_minus_a=len(be - ae),
                 novel_edge_ratio_b=len(be - ae) / len(be) if be else None,
                 shared_edges=len(ae & be), union_edges=len(ae | be), a=sa, b=sb, union=su,
-                component_bridging_edges=bridges, novel_union_two_hop_paths=len(pu - pa - pb),
+                component_bridging_edges=bridges, novel_union_two_hop_paths=len(pu - pa - pb) if all(p is not None for p in (pu, pa, pb)) else None,
                 shared_exact_evidence_spans=shared_evidence, novel_evidence_spans_on_shared_edges=novel_evidence,
                 novel_evidence_characters_on_shared_edges=novel_chars,
                 path_validity='unverified structural proxy; not evidence-path recall')
@@ -247,7 +271,8 @@ def cost(rows, rates):
                 monetary_unit='user-specified', rates_per_million=rates)
 
 
-def analyze(run, out, alignment=None, rates=None, per_stratum=20, pairs=False):
+def analyze(run, out, alignment=None, rates=None, per_stratum=20, pairs=False,
+            comparison_pairs=None, max_paths=None, compact_review=False):
     out = Path(out)
     if out.exists():
         raise ValueError('Use a fresh analysis directory to preserve previous snapshots')
@@ -269,6 +294,11 @@ def analyze(run, out, alignment=None, rates=None, per_stratum=20, pairs=False):
         mapping = nm, fm, canonical
         save(out / 'alignment_applied.json', decisions)
     conditions = sorted({condition(j) for j in m['jobs']})
+    selected_pairs = list(itertools.permutations(conditions, 2)) if comparison_pairs is None else [tuple(p) for p in comparison_pairs]
+    if len(set(selected_pairs)) != len(selected_pairs) or any(a == b or a not in conditions or b not in conditions for a, b in selected_pairs):
+        raise ValueError('Invalid comparison pairs')
+    if max_paths is not None and max_paths < 1:
+        raise ValueError('max_paths must be positive')
     regions = sorted({r['region_id'] for r in m['regions']})
     grouped = defaultdict(list)
     for s in status:
@@ -286,11 +316,11 @@ def analyze(run, out, alignment=None, rates=None, per_stratum=20, pairs=False):
                 g['common_cohort'] = rid in complete
                 graphs[mode, rid, c] = g
                 save(out / 'graphs' / f'{mode}_{digest([rid, c])[:20]}.json', g)
-        for a, b in itertools.permutations(conditions, 2):
+        for a, b in selected_pairs:
             for rid in complete:
                 comparisons.append(dict(mode=mode, region_id=rid, baseline=a, added=b,
                     alignment_complete=coverage['complete'] if mode == 'semantic' else None,
-                    metrics=compare(graphs[mode, rid, a], graphs[mode, rid, b])))
+                    metrics=compare(graphs[mode, rid, a], graphs[mode, rid, b], max_paths)))
     save(out / 'comparisons.json', comparisons)
     aggregates = []
     for mode, baseline, added in sorted({(r['mode'], r['baseline'], r['added']) for r in comparisons}):
@@ -307,8 +337,9 @@ def analyze(run, out, alignment=None, rates=None, per_stratum=20, pairs=False):
         aggregates.append(dict(mode=mode, baseline=baseline, added=added, regions=len(rows), documents=len(docs), metrics=metrics))
     save(out / 'document_macro.json', aggregates)
     review, key, rng = [], [], random.Random(17)
+    baselines = {}
     mode = 'semantic' if mapping else 'literal'
-    for a, b in itertools.permutations(conditions, 2):
+    for a, b in selected_pairs:
         for rid in complete:
             ga, gb = graphs[mode, rid, a], graphs[mode, rid, b]
             for stratum, pool in (('novel', set(gb['edges']) - set(ga['edges'])),
@@ -325,8 +356,12 @@ def analyze(run, out, alignment=None, rates=None, per_stratum=20, pairs=False):
                         return dict(source=name(e['source']), predicate=e['predicate'], target=name(e['target']),
                                     polarity=e['polarity'], time=e['time'], condition=e['condition'],
                                     evidence_spans=e['evidence_spans'])
+                    baseline_id = digest([input_hash, mode, rid, a])[:24]
+                    if baseline_id not in baselines:
+                        baselines[baseline_id] = [display(ga, k) for k in sorted(ga['edges'])]
                     review.append(dict(id=item_id, region_id=rid, claim=display(gb, edge_id),
-                                       baseline_claims=[display(ga, k) for k in sorted(ga['edges'])],
+                                       **({'baseline_ref': baseline_id} if compact_review else
+                                          {'baseline_claims': baselines[baseline_id]}),
                                        supported=None, semantically_novel=None, error_type=None,
                                        annotator='', rationale=''))
                     key.append(dict(id=item_id, baseline=a, added=b, region_id=rid,
@@ -335,8 +370,11 @@ def analyze(run, out, alignment=None, rates=None, per_stratum=20, pairs=False):
                                     inclusion_probability=len(chosen) / len(pool), edge_id=edge_id))
     rng.shuffle(review)
     save(out / 'review_blind.json', review)
+    if compact_review:
+        save(out / 'review_baselines.json', baselines)
     save(out / 'review_key.json', key)
     summary = dict(analysis_code_sha256=sha(Path(__file__).read_text()), core_code_sha256=sha(Path(__file__).with_name('core.py').read_text()), input_hash=input_hash, manifest_hash=digest(m), raw_hash=raw_hash,
+                   comparison_pairs=selected_pairs, max_paths=max_paths, compact_review=compact_review,
                    legacy=m.get('version') != 'experiment1-v1', conditions=conditions,
                    common_complete_regions=complete, excluded_regions=sorted(set(regions) - set(complete)),
                    total_regions=len(regions), total_calls=len(status), recorded_calls=sum(s['recorded'] for s in status),
@@ -369,7 +407,7 @@ def evaluate(analysis, annotations, output):
         rid = row['id']
         if rid not in template or rid in submitted:
             raise ValueError('Unknown or duplicate review id')
-        for field in ('region_id', 'claim', 'baseline_claims'):
+        for field in ('region_id', 'claim', 'baseline_ref' if 'baseline_ref' in template[rid] else 'baseline_claims'):
             if row[field] != template[rid][field]:
                 raise ValueError('Review input content was modified')
         for field in ('supported', 'semantically_novel'):
@@ -377,6 +415,12 @@ def evaluate(analysis, annotations, output):
                 raise ValueError('Review labels must be true/false/null')
         submitted[rid] = row
     groups = defaultdict(list)
+    # Empty added graphs have zero candidates, not missing comparisons.
+    summary = read(root / 'summary.json')
+    mode = 'semantic' if summary['semantic_alignment'] is not None else 'literal'
+    for row in read(root / 'comparisons.json'):
+        if row['mode'] == mode:
+            groups[row['baseline'], row['added']]
     for k in key:
         groups[k['baseline'], k['added']].append(k)
     costs = read(root / 'summary.json')['costs']
@@ -406,7 +450,7 @@ def evaluate(analysis, annotations, output):
                            estimated_valid_novel_by_doc=dict(by_doc) if complete else None,
                            additional_seconds_per_estimated_valid_novel=costs[b]['seconds_recorded'] / estimate if complete and estimate and costs[b]['missing_time_calls'] == 0 else None,
                            additional_money_per_estimated_valid_novel=costs[b]['monetary_cost'] / estimate if complete and estimate and costs[b]['monetary_cost'] is not None else None))
-    report = dict(comparisons=result, notes=['Descriptive stratified HT estimates, no recall or significance claim.',
+    report = dict(input_hash=summary['input_hash'], annotations_sha256=sha(Path(annotations).read_text()), comparisons=result, notes=['Descriptive stratified HT estimates, no recall or significance claim.',
           'Costs include all added-condition calls, including excluded regions and failed calls.',
           'Shared-stratum audit can reveal false semantic/literal merges.',
           'Multiple annotators should adjudicate one final label per item externally.'])

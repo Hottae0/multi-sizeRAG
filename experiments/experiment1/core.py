@@ -1,5 +1,6 @@
 """Experiment 1 data contract and single-pass extraction. Standard library only."""
 from __future__ import annotations
+import codecs
 import hashlib
 import json
 import os
@@ -79,6 +80,8 @@ def validate_manifest(m):
             raise ValueError('Source hash/text mismatch')
         groups.setdefault((j['region_id'], condition(j)), []).append(j)
     conditions = {condition(j) for j in jobs}
+    if m.get('version') == 'experiment1-v1' and 'conditions' in m and conditions != {condition(c) for c in m['conditions']}:
+        raise ValueError('Manifest conditions differ from declared plan')
     if {j['size'] for j in jobs} != set(SIZES):
         raise ValueError('All four sizes required')
     for rid, r in regions.items():
@@ -96,53 +99,58 @@ def validate_manifest(m):
     return m
 
 
-def split_region(region, pieces, sizes=SIZES, seeds=(17,), boundaries=(0,)):
+def split_region(region, pieces, sizes=SIZES, seeds=(17,), boundaries=(0,), conditions=None):
     """UTF-8-safe cuts, boundary offset changes first cut; retains both edge tails."""
     parts = [p.encode() if isinstance(p, str) else bytes(p) for p in pieces]
     blob = b''.join(parts)
     if blob != region['text'].encode():
         raise ValueError('Tokenizer must round-trip exactly')
-    ends = [0]
-    for p in parts:
-        ends.append(ends[-1] + len(p))
-    safe = {0: 0}
-    # Decode full prefixes once per token; regions are intentionally bounded (4096 tokens).
-    for i, end in enumerate(ends[1:], 1):
-        try:
-            safe[i] = len(blob[:end].decode('utf-8'))
-        except UnicodeDecodeError:
-            pass
+    # Incremental decoding is linear in source bytes (full novels can be very long).
+    decoder = codecs.getincrementaldecoder('utf-8')()
+    safe, chars = {0: 0}, 0
+    for i, part in enumerate(parts, 1):
+        chars += len(decoder.decode(part, final=False))
+        if not decoder.getstate()[0]:
+            safe[i] = chars
+    decoder.decode(b'', final=True)
     jobs = []
-    for size in sizes:
-        for boundary in boundaries:
-            if not 0 <= boundary < size:
-                raise ValueError('Boundary offset must be in [0, min(size))')
-            cuts = [0]
-            k = boundary or size
-            while k < len(parts):
-                while k not in safe:
-                    k += 1
-                if k < len(parts) and safe[k] > safe[cuts[-1]]:
-                    cuts.append(k)
-                k += size
-            cuts.append(len(parts))
-            for seed in seeds:
-                for index, (a, b) in enumerate(zip(cuts, cuts[1:])):
-                    lo, hi = safe[a], safe[b]
-                    if lo == hi:
-                        continue
-                    text = region['text'][lo:hi]
-                    j = dict(doc_id=region['doc_id'], region_id=region['region_id'],
-                             size=size, seed=seed, boundary=boundary, token_start=a, token_end=b,
-                             char_start=region['char_start'] + lo, char_end=region['char_start'] + hi,
-                             text=text, sha256=sha(text))
-                    j['job_id'] = digest(j)[:24]
-                    jobs.append(j)
+    selected = conditions or [dict(size=s, seed=z, boundary=b)
+                              for s in sizes for z in seeds for b in boundaries]
+    by_width = {}
+    for c in selected:
+        if c['size'] not in SIZES or type(c['seed']) is not int:
+            raise ValueError('Invalid extraction condition')
+        by_width.setdefault((c['size'], c.get('boundary', 0)), []).append(c['seed'])
+    for (size, boundary), selected_seeds in by_width.items():
+        if not 0 <= boundary < size:
+            raise ValueError('Boundary offset must be in [0, min(size))')
+        cuts = [0]
+        k = boundary or size
+        while k < len(parts):
+            while k not in safe:
+                k += 1
+            if k < len(parts) and safe[k] > safe[cuts[-1]]:
+                cuts.append(k)
+            k += size
+        cuts.append(len(parts))
+        for seed in selected_seeds:
+            for index, (a, b) in enumerate(zip(cuts, cuts[1:])):
+                lo, hi = safe[a], safe[b]
+                if lo == hi:
+                    continue
+                text = region['text'][lo:hi]
+                j = dict(doc_id=region['doc_id'], region_id=region['region_id'],
+                         size=size, seed=seed, boundary=boundary, token_start=a, token_end=b,
+                         char_start=region['char_start'] + lo, char_end=region['char_start'] + hi,
+                         text=text, sha256=sha(text))
+                j['job_id'] = digest(j)[:24]
+                jobs.append(j)
     return jobs
 
 
 def prepare(source, out, url, model, model_revision, tokenizer_id, server_id,
-            seeds=(17,), boundaries=(0,), max_tokens=4096, temperature=0.2):
+            seeds=(17,), boundaries=(0,), max_tokens=4096, temperature=0.2,
+            conditions=None, protocol_overrides=None):
     if Path(out, 'manifest.json').exists():
         raise ValueError('Use a new run directory')
     if max_tokens <= 0:
@@ -153,10 +161,12 @@ def prepare(source, out, url, model, model_revision, tokenizer_id, server_id,
     for r in regions:
         result = json.loads(post(url.rstrip('/') + '/tokenize',
                                  {'content': r['text'], 'add_special': False, 'with_pieces': True}))
+        if (protocol_overrides or {}).get('verify_server_id') and result.get('server_id') != server_id:
+            raise ValueError('Tokenizer server identity mismatch')
         r['source_tokens'] = r.get('tokens')
         r['tokens'] = len(result['tokens'])
         r['tokenization_sha256'] = digest(result['tokens'])
-        jobs += split_region(r, [t['piece'] for t in result['tokens']], seeds=seeds, boundaries=boundaries)
+        jobs += split_region(r, [t['piece'] for t in result['tokens']], seeds=seeds, boundaries=boundaries, conditions=conditions)
     random.Random(17).shuffle(jobs)
     m = dict(version='experiment1-v1', corpus_sha256=original['corpus_sha256'],
              source_manifest_sha256=sha(Path(source).read_text()), regions=regions, jobs=jobs,
@@ -164,6 +174,13 @@ def prepare(source, out, url, model, model_revision, tokenizer_id, server_id,
                            server_id=server_id, url=url.rstrip('/'), temperature=temperature,
                            max_tokens=max_tokens, top_p=0.9, prompt=PROMPT, gleaning=0,
                            retries=0, timeout=300, implementation_sha256=sha(Path(__file__).read_text())))
+    if conditions is not None:
+        m['conditions'] = conditions
+    if protocol_overrides:
+        allowed = {'prompt', 'top_p', 'timeout', 'verify_server_id'}
+        if set(protocol_overrides) - allowed:
+            raise ValueError('Unsupported protocol override')
+        m['protocol'].update(protocol_overrides)
     validate_manifest(m)
     save(Path(out) / 'manifest.json', m)
     return m
@@ -171,7 +188,8 @@ def prepare(source, out, url, model, model_revision, tokenizer_id, server_id,
 
 def request(m, job):
     p = m['protocol']
-    return dict(model=p['model'], messages=[{'role': 'system', 'content': p['prompt']},
+    return dict(**({'_experiment_server_id': p['server_id']} if p.get('verify_server_id') else {}),
+                model=p['model'], messages=[{'role': 'system', 'content': p['prompt']},
                 {'role': 'user', 'content': 'PASSAGE:\n' + job['text']}],
                 temperature=p['temperature'], top_p=p['top_p'], seed=job['seed'],
                 max_tokens=p['max_tokens'], response_format={'type': 'json_object'})
@@ -211,6 +229,9 @@ def extract(run, transport=post, limit=None):
                 record.update(wire_response=wire, state='received')
                 save(path, record)  # Persist original response BEFORE JSON parsing.
                 record['response'] = json.loads(wire)
+                if m['protocol'].get('verify_server_id') and record['response'].get('server_id') != m['protocol']['server_id']:
+                    record.pop('response')
+                    raise ValueError('Inference server identity mismatch')
                 record['state'] = 'finished'
             except urllib.error.HTTPError as exc:
                 record.update(state='failed', error=f'HTTP {exc.code}', wire_response=exc.read().decode(errors='replace'))
