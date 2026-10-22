@@ -8,6 +8,8 @@ Fusion·progressive refinement·검색·QA 개선은 아직 검증하지 않았�
 
 ## 현재 측정 방식 — 최대 청크 블록과 사실·측면 리뷰
 
+같은 설정으로 다른 문서 한 개를 추출하려면 [추가 문서·판정·재개 안내](experiments/experiment1/JUDGMENT_AND_RESUME.md)를 사용하세요. 세션 재접속 후 기존 파일이 남아 있으면 ZIP 복원은 필요 없습니다. 원본 데이터는 GitHub에 포함하지 않습니다.
+
 2026-10-22부터 새 측정은 [`experiments.experiment1.perspectives`](experiments/experiment1/FACT_PERSPECTIVES.md)를 사용합니다.
 같은 최대 청크 범위 안에서 작은 청크들의 그래프를 합쳐 비교하고, **원문 지지 / 정보 추가 유형 / 달라진 측면**을 별도로 검토합니다.
 비용은 참고 기록이며 주평가지표가 아닙니다. 기존 결과를 읽는 오프라인 분석으로 재추출하지 않습니다.

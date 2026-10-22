@@ -1,5 +1,7 @@
 # Experiment 1: 새로운 사실과 다른 측면의 포착
 
+모델의 1차 판정, 오류 수정 분리, 재검토 및 같은 설정의 다음 문서 추출은 [JUDGMENT_AND_RESUME.md](JUDGMENT_AND_RESUME.md)에 추가했다. 아래 v1 분석 결과를 그대로 입력할 수 있다.
+
 2026-10-22. 새 측정 명령은 `python3 -m experiments.experiment1.perspectives`다.
 기존 `study` / `analyze` / `evaluate` v1은 이전 실험 재현용으로 유지한다.
 **새 사실과 관점 측정에는 아래 명령을 사용한다.** Python 3.10+ 표준 라이브러리만 필요하다.
