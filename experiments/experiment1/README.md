@@ -1,5 +1,7 @@
 # Experiment 1 — Multi-granularity Graph Complementarity
 
+> 2026-10-22 측정 변경: 새 사실·구체화·다른 측면의 최대 청크 블록 비교는 [FACT_PERSPECTIVES.md](FACT_PERSPECTIVES.md)를 사용한다. 이 문서는 기존 v1 추출/분석 재현용으로 유지한다. 기존 study/raw를 수정하지 않는다.
+
 ## 현재 설계: 5조건·2가지 분석·1→5→20문서
 
 |구분|실행 내용|

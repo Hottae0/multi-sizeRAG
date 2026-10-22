@@ -1,10 +1,25 @@
 # multi-sizeRAG
 
-**같은 문서의 전체 원문을 여러 chunk size로 추출하면, 같은 크기를 반복하는 것보다 더 많은 유효 관계를 얻을 수 있을까요?**
+**청크 크기가 달라지면 새로운 사실, 기존 사실의 구체화, 같은 사건의 다른 측면을 포착할까요?**
 
 최종 목표는 이 상호보완성을 활용하는 새로운 GraphRAG 방법론입니다.
 현재 Experiment 1에서는 크기별 그래프의 유효한 차이를 먼저 검증합니다.
 Fusion·progressive refinement·검색·QA 개선은 아직 검증하지 않았습니다.
+
+## 현재 측정 방식 — 최대 청크 블록과 사실·측면 리뷰
+
+2026-10-22부터 새 측정은 [`experiments.experiment1.perspectives`](experiments/experiment1/FACT_PERSPECTIVES.md)를 사용합니다.
+같은 최대 청크 범위 안에서 작은 청크들의 그래프를 합쳐 비교하고, **원문 지지 / 정보 추가 유형 / 달라진 측면**을 별도로 검토합니다.
+비용은 참고 기록이며 주평가지표가 아닙니다. 기존 결과를 읽는 오프라인 분석으로 재추출하지 않습니다.
+
+```bash
+python3 -m experiments.experiment1.perspectives analyze \
+  --run runs/novel_nohup_v1/documents/Novel-10146 \
+  --out runs/Novel-10146-facts-strict-v1
+```
+
+서버의 별도 checkout, 누락 qualifier 감도분석, 리뷰 작성·평가 명령은 [새 측정 안내](experiments/experiment1/FACT_PERSPECTIVES.md)에 있습니다.
+아래 내용은 기존 v1 전체 문서 실험의 추출 구성과 재현 절차입니다. 새 측정 결과는 v1 report와 혼합하지 않습니다.
 
 ## 지금 하는 실험은 몇 개인가요?
 
@@ -39,7 +54,7 @@ Fusion·progressive refinement·검색·QA 개선은 아직 검증하지 않았�
 
 Jaccard는 대칭이지만 신규 관계는 방향별로 다릅니다. 크기별 6쌍은 12방향이며,
 동일 크기 반복의 양방향 2개를 더해 모드당 문서당 14방향을 계산합니다.
-주 비교는 공통 G256(seed17)에 추가되는 **원문 지지 AND 의미적으로 새로운 관계**의 수와 비용을 비교합니다.
+기존 v1 주 비교는 공통 G256(seed17)에 추가되는 **원문 지지 AND 의미적으로 새로운 관계**의 수와 비용을 비교했습니다. 새 측정은 정보 추가 유형과 다른 측면을 분리하고 비용은 참고로 둡니다.
 표현만 다른 관계나 원문이 지지하지 않는 관계를 유효 신규 관계로 세지 않습니다.
 
 ### 3. 전체 원문 1→5→20문서로 확장합니다

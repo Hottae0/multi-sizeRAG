@@ -1,5 +1,7 @@
 # 전체 원문 Experiment 1 — CUDA 서버 실행 안내
 
+> 2026-10-22 측정 변경: 새 사실·구체화·다른 측면의 최대 청크 블록 비교는 [FACT_PERSPECTIVES.md](FACT_PERSPECTIVES.md)를 사용한다. 이 문서는 기존 v1 추출/분석 재현용으로 유지한다. 기존 study/raw를 수정하지 않는다.
+
 CPU 4코어 / RAM 128GB / A100 80GB 1개 / 저장공간 500GB 서버를 기준으로 준비했습니다.
 **실제 GPU 추론은 아직 검증하지 않았습니다.** 아래 backend와 흐름을 서버에서 첫 개발 문서로 검증해 주세요.
 모델은 임의로 확정하지 않았습니다. Text instruct causal LM의 로컬 Hugging Face checkpoint를 사용하거나
