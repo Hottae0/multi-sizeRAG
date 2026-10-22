@@ -1,5 +1,7 @@
 # Experiment 1 — Multi-granularity Graph Complementarity
 
+> 2026-10-23 전체 크기 결합 분석: [ALL_SIZE_COMPLEMENTARITY.md](ALL_SIZE_COMPLEMENTARITY.md). 128·256·512·1024 합집합, 크기별 제외 효과, 블록별 최선 선택 대조 및 근거 검토를 새 문서에도 반복 실행한다.
+
 > 2026-10-22 측정 변경: 새 사실·구체화·다른 측면의 최대 청크 블록 비교는 [FACT_PERSPECTIVES.md](FACT_PERSPECTIVES.md)를 사용한다. 이 문서는 기존 v1 추출/분석 재현용으로 유지한다. 기존 study/raw를 수정하지 않는다.
 
 ## 현재 설계: 5조건·2가지 분석·1→5→20문서
